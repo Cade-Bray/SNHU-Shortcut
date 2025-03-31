@@ -1,4 +1,4 @@
-# SNHU-Shortcut
+# <img src=".images/Logo.jpg?raw=true" alt="Project Logo" style="width:auto; height:200px;"> SNHU-Shortcut
 I was very frustrated with the SNHU certificate page because it organized everything by provider.
 Since it was organized in this way users have to 'hunt and peck' for certificates that cover classes
 they're looking to take outside of SNHU. With this program you can execute the py file to pull and 
