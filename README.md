@@ -16,4 +16,4 @@ a list will only happen on a 24hr bases instead of on every execution.
 
 
 ### Terminal example
-[Terminal Example](https://raw.githubusercontent.com/Cade-Bray/SNHU-Shortcut/refs/heads/master/.images/terminal_example.png)
+![Terminal Example](.images/terminal_example.png)
