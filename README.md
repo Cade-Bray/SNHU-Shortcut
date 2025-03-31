@@ -16,4 +16,4 @@ a list will only happen on a 24hr bases instead of on every execution.
 
 
 ### Terminal example
-
+<img src="./images/terminal_example.png" alt="terminal example">
