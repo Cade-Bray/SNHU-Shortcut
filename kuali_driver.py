@@ -1,8 +1,8 @@
-import json
-import os.path
 from datetime import datetime
 from lxml import html
 import requests
+import json
+import os.path
 
 
 class Course:
