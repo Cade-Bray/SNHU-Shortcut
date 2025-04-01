@@ -17,3 +17,13 @@ a list will only happen on a 24hr bases instead of on every execution.
 
 ### Terminal example
 ![Terminal Example](.images/terminal_example.png)
+
+<br>
+
+## Disclaimer
+
+The software provided in this repository is offered "as-is" without any warranties or guarantees of any kind, either express or implied. The author(s) of this software shall not be held liable for any damages, losses, or issues arising from the use or inability to use this software, including but not limited to direct, indirect, incidental, special, consequential, or punitive damages.
+
+By using this software, you acknowledge that you do so at your own risk. It is your responsibility to ensure that the software meets your requirements and to test it in a safe environment before deploying it in a production setting. The author(s) make no representations about the suitability, reliability, availability, timeliness, or accuracy of the software for any purpose.
+
+If you have any questions or concerns regarding this software, please contact the author(s) directly.
