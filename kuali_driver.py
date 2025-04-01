@@ -153,7 +153,7 @@ def get_courses():
 
     return courses
 
-def load_courses():
+def load_courses() -> dict:
     """
     This function will check if there is a json file in the appdata directory called courses.json. If the file exists,
     the function will load the file and return a dictionary of Course objects. If the file does not exist, the function
