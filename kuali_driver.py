@@ -1,3 +1,5 @@
+import json
+import os.path
 from datetime import datetime
 from lxml import html
 import requests
@@ -151,10 +153,69 @@ def get_courses():
 
     return courses
 
+def load_courses():
+    """
+    This function will check if there is a json file in the appdata directory called courses.json. If the file exists,
+    the function will load the file and return a dictionary of Course objects. If the file does not exist, the function
+    will call the get_courses() function to get the courses from the Kuali API and save them to a json file. It will
+    also check if the file is older than 24 hours. If the file is older than 24 hours, the function will call the
+    get_courses() function to get the courses from the Kuali API and overwrite/write them to the json file.
+
+    :return: A dictionary of Course objects
+    """
+
+    # Create folder in appdata if it doesn't exist
+    app_data_path = os.path.join(os.getenv('APPDATA'), 'SNHU-Shortcut')
+    if not os.path.exists(app_data_path):
+        os.makedirs(app_data_path)
+
+    # Check if the file exists
+    json_path = os.path.join(app_data_path, 'courses.json')
+    if os.path.exists(json_path):
+        # Check when courses.json was last modified
+        last_modified = datetime.fromtimestamp(os.path.getmtime(json_path))
+
+        # If the file was modified in the last 24 hours, load the file
+        if (datetime.now() - last_modified).total_seconds() < 86400:
+            # Load the file
+            with open(json_path, 'r') as f:
+                data = json.load(f)
+                courses = {}
+                for course_code, course_data in data.items():
+                    course = Course(course_data['title'], course_data['credits'], course_data['catalog'])
+                    for cert_data in course_data['Certifications']:
+                        certificate = Cert(cert_data['title'], None, cert_data['provider'], cert_data['pid'])
+                        course.add_certification(certificate)
+                    courses[course_code] = course
+            return courses
+
+    # Get the courses from the Kuali API
+    courses = get_courses()
+
+    # Save the courses to a json file
+    with open(json_path, 'w') as f:
+        data = {}
+        for course_code, course in courses.items():
+            data[course_code] = {
+                'title': course.title,
+                'credits': course.credits,
+                'catalog': course.catalog,
+                'Certifications': []
+            }
+            for certificate in course.Certifications:
+                data[course_code]['Certifications'].append({
+                    'title': certificate.title,
+                    'provider': certificate.provider,
+                    'pid': certificate.pid
+                })
+        json.dump(data, f)
+
+    return courses
+
 
 if __name__ == "__main__":
     print("Acquiring course information... Please wait.")
-    crses = get_courses()
+    crses = load_courses()
     while True:
         course_to_match = input("\nRespond with 'exit' to leave the program.\n"
                                 "Enter a course code to find associated certifications: ")
