@@ -164,8 +164,13 @@ def load_courses() -> dict:
     :return: A dictionary of Course objects
     """
 
+    # Get the APPDATA environment variable
+    app_data_dir = os.getenv('APPDATA')
+    if not app_data_dir:
+        raise EnvironmentError("The 'APPDATA' environment variable is not set.")
+
     # Create folder in appdata if it doesn't exist
-    app_data_path = os.path.join(os.getenv('APPDATA'), 'SNHU-Shortcut')
+    app_data_path = os.path.join(app_data_dir, 'SNHU-Shortcut')
     if not os.path.exists(app_data_path):
         os.makedirs(app_data_path)
 
