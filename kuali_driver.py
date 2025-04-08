@@ -183,16 +183,20 @@ def load_courses() -> dict:
         # If the file was modified in the last 24 hours, load the file
         if (datetime.now() - last_modified).total_seconds() < 86400:
             # Load the file reading the json file
-            with open(json_path, 'r') as f:
-                data = json.load(f)
-                courses = {}
-                for course_code, course_data in data.items():
-                    course = Course(course_data['title'], course_data['credits'], course_data['catalog'])
-                    for cert_data in course_data['Certifications']:
-                        certificate = Cert(cert_data['title'], None, cert_data['provider'], cert_data['pid'])
-                        course.add_certification(certificate)
-                    courses[course_code] = course
-            return courses
+            try:
+                with open(json_path, 'r') as f:
+                    data = json.load(f)
+                    courses = {}
+                    for course_code, course_data in data.items():
+                        course = Course(course_data['title'], course_data['credits'], course_data['catalog'])
+                        for cert_data in course_data['Certifications']:
+                            certificate = Cert(cert_data['title'], None, cert_data['provider'], cert_data['pid'])
+                            course.add_certification(certificate)
+                        courses[course_code] = course
+                return courses
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON: {e}. Re-fetching data from Kuali API.")
+                os.remove(json_path)
 
     # Get the courses from the Kuali API
     courses = get_courses()
