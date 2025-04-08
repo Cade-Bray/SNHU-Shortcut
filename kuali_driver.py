@@ -177,7 +177,7 @@ def load_courses() -> dict:
 
         # If the file was modified in the last 24 hours, load the file
         if (datetime.now() - last_modified).total_seconds() < 86400:
-            # Load the file
+            # Load the file reading the json file
             with open(json_path, 'r') as f:
                 data = json.load(f)
                 courses = {}
