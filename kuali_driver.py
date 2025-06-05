@@ -165,7 +165,8 @@ def load_courses() -> dict:
     """
 
     # Get the APPDATA environment variable
-    app_data_dir = os.getenv('APPDATA')
+    #app_data_dir = os.getenv('APPDATA')
+    app_data_dir = "./"
     if not app_data_dir:
         raise EnvironmentError("The 'APPDATA' environment variable is not set.")
 

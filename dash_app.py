@@ -24,9 +24,6 @@ def main():
     :return: void
     """
 
-    # Load courses from Kuali
-    courses = kd.load_courses()
-
     # Create a Dash application
     app.title = "SNHU Shortcut"
 
@@ -187,8 +184,9 @@ def main():
         ]
     )
 
-    # Hit the go button!
-    app.run(debug=False, use_reloader=True, port=80)
+    # app.run is for development purposes only
+    #app.run(debug=False, use_reloader=True, port=80)
+
 
 @app.callback(
     Output("output_div", "children"),
