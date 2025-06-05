@@ -120,11 +120,30 @@ def main():
                            "certifications can even be used to satisfy multiple courses at once. Some certifications "
                            "can even be completed in a fraction of the time it would take to complete a course. Allowing"
                            " more experienced students to graduate faster."),
+                    html.P([
+                        "A full list of certifications can be found on the ",
+                        html.A(
+                            href="https://www.snhu.edu/admission/transferring-credits/work-life-experience/#/experiences",
+                            target="_blank",
+                            children=["SNHU certifications page"]
+                        ),
+                        ". You may be wondering how this website differs from the SNHU certifications page. The SNHU "
+                        "certification page is structured in such a way that it is difficult to find certifcations that"
+                        " satisfy a specific course. This website allows you to enter a course ID and find all instantly"
+                        ". Please note that this website is updating daily and may not have the most up to date depending"
+                        "on the most recent update to the SNHU certifications page."
+                    ]),
                     html.Br()
                 ],
                 style = {'textAlign': 'center', 'margin': '20px'}
             ),
             html.Hr(),
+            html.P("This website can find certifications that return general elective credits as well. To find"
+                   " an elective credit search by the department code, the level of elective credit, and the "
+                   "term ELE. For example, 100 level IT elective credits would be IT1ELE, 200 level "
+                   "IT elective credits would be IT2ELE, and so on.",
+                   style={'textAlign': 'center', 'margin': '20px'}
+                   ),
             html.Div(
                 [
                     html.Br(),
@@ -213,6 +232,7 @@ def update_output(n_clicks, n_submit, course_id):
                     {"name": "Title", "id": "Title"}
                 ],
                 data=data,
+                cell_selectable=False,
                 style_table={'width': '100%', 'margin': 'auto', 'overflowX': 'auto'},
                 style_cell={'textAlign': 'left', 'padding': '8px', 'minWidth': '100px', 'maxWidth': '300px', 'whiteSpace': 'normal'},
                 style_header={'fontWeight': 'bold'}
