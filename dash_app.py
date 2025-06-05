@@ -16,6 +16,7 @@ app = Dash(
             {"name": "viewport", "content": "width=device-width, initial-scale=1.0"}
         ],
     )
+server = app.server
 
 def main():
     """
@@ -187,7 +188,7 @@ def main():
     )
 
     # Hit the go button!
-    app.run(debug=True, use_reloader=True, port=80)
+    app.run(debug=False, use_reloader=True, port=80)
 
 @app.callback(
     Output("output_div", "children"),
