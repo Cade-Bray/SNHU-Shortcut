@@ -110,7 +110,7 @@ app.layout = html.Div(
                        " They are designed to help students gain practical skills and knowledge that can be applied "
                        "in the real world. Additionally, they're often highly valued by employers which can add to"
                        " your post graduation resume. It's common for students to take these to satisfy courses in a"
-                       " more cost effective way or to allow for more flexibility in their in their education. Some"
+                       " more cost effective way or to allow for more flexibility in their in their education. Some "
                        "certifications can even be used to satisfy multiple courses at once. Some certifications "
                        "can even be completed in a fraction of the time it would take to complete a course. Allowing"
                        " more experienced students to graduate faster."),
@@ -122,9 +122,9 @@ app.layout = html.Div(
                         children=["SNHU certifications page"]
                     ),
                     ". You may be wondering how this website differs from the SNHU certifications page. The SNHU "
-                    "certification page is structured in such a way that it is difficult to find certifcations that"
+                    "certification page is structured in such a way that it is difficult to find certifications that"
                     " satisfy a specific course. This website allows you to enter a course ID and find all instantly"
-                    ". Please note that this website is updating daily and may not have the most up to date depending"
+                    ". Please note that this website is updating daily and may not have the most up to date depending "
                     "on the most recent update to the SNHU certifications page."
                 ]),
                 html.Br()
@@ -170,9 +170,9 @@ app.layout = html.Div(
                        "timeliness, or accuracy of the software for any purpose."),
                 html.P("If you have any questions or concerns regarding this software, please contact the author(s)"
                        " directly at:"),
-                html.A(href="mailto:Bray.Cade@gmail.com", target="_blank",
+                html.A(href="mailto:contact@cadebray.com", target="_blank",
                        children=[
-                           html.P("Bray.Cade@gmail.com")
+                           html.P("Contact@CadeBray.com")
                        ]
                 )
             ],
