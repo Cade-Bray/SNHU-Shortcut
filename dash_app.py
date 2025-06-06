@@ -2,6 +2,7 @@ from dash import html, Dash, dcc, dash_table, Input, Output, State
 from waitress import serve
 import kuali_driver as kd
 import base64
+import time
 import os
 
 #########################
@@ -210,7 +211,7 @@ def update_output(n_clicks, n_submit, course_id):
     """
     trigger = n_clicks or n_submit
     course_id = sanitize_input(course_id)
-    print(f"Callback triggered: n_clicks={n_clicks}, n_submit={n_submit}, course_id={course_id}")
+    print(f"[INFO - {time.strftime('%Y-%m-%d %H:%M:%S')}] Callback triggered: n_clicks={n_clicks}, n_submit={n_submit}, course_id={course_id}")
     if trigger and trigger > 0:
         if not course_id:
             return html.Div("Please enter a valid course ID.", style={'color': 'red', 'textAlign': 'center'})

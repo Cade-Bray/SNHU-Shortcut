@@ -153,7 +153,7 @@ def get_courses():
 
     return courses
 
-def load_courses() -> dict:
+def load_courses(force=False, terminal=False) -> dict:
     """
     This function will check if there is a json file in the appdata directory called courses.json. If the file exists,
     the function will load the file and return a dictionary of Course objects. If the file does not exist, the function
@@ -165,10 +165,14 @@ def load_courses() -> dict:
     """
 
     # Get the APPDATA environment variable
-    #app_data_dir = os.getenv('APPDATA')
-    app_data_dir = "./"
-    if not app_data_dir:
-        raise EnvironmentError("The 'APPDATA' environment variable is not set.")
+    if terminal:
+        # If terminal is True, use the APPDATA environment variable
+        app_data_dir = os.getenv('APPDATA')
+        if not app_data_dir:
+            raise EnvironmentError("The 'APPDATA' environment variable is not set.")
+    else:
+        # If terminal is False, the current directory executed from.
+        app_data_dir = os.getcwd()
 
     # Create folder in appdata if it doesn't exist
     app_data_path = os.path.join(app_data_dir, 'SNHU-Shortcut')
@@ -177,12 +181,17 @@ def load_courses() -> dict:
 
     # Check if the file exists
     json_path = os.path.join(app_data_path, 'courses.json')
-    if os.path.exists(json_path):
-        # Check when courses.json was last modified
-        last_modified = datetime.fromtimestamp(os.path.getmtime(json_path))
+    if os.path.exists(json_path) or force:
+
+        if not force:
+            # Check when courses.json was last modified
+            last_modified = datetime.fromtimestamp(os.path.getmtime(json_path))
+        else:
+            # If force is True, we will not check the last modified time
+            last_modified = datetime.min
 
         # If the file was modified in the last 24 hours, load the file
-        if (datetime.now() - last_modified).total_seconds() < 86400:
+        if (datetime.now() - last_modified).total_seconds() < 86400 and not force:
             # Load the file reading the json file
             try:
                 with open(json_path, 'r') as f:
@@ -224,11 +233,15 @@ def load_courses() -> dict:
 
 
 if __name__ == "__main__":
+    from dash_app import sanitize_input # putting this here to avoid circular import issues
+
     print("Acquiring course information... Please wait.")
-    crses = load_courses()
+    crses = load_courses(terminal=True)
     while True:
         course_to_match = input("\nRespond with 'exit' to leave the program.\n"
                                 "Enter a course code to find associated certifications: ")
+        course_to_match = sanitize_input(course_to_match)
+
         if course_to_match.lower() == 'exit':
             break
         elif course_to_match in crses:
