@@ -135,7 +135,7 @@ app.layout = html.Div(
         html.Hr(),
         html.P("This website can find certifications that return general elective credits as well. To find"
                " an elective credit search by the department code, the level of elective credit, and the "
-               "term ELE. For example, 100 level IT elective credits would be IT1ELE, 200 level "
+               "term ELE. For example, 100 level GEN as in General elective credits would be GEN1ELE, 200 level "
                "IT elective credits would be IT2ELE, and so on. If you search for a course ID and the results are not"
                " updating please wait a moment because the SNHU certifications page is updating. ",
                style={'textAlign': 'center', 'margin': '20px'}
