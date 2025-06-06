@@ -231,10 +231,22 @@ def load_courses(force=False, terminal=False) -> dict:
 
     return courses
 
+def sanitize_input(input_value):
+    """
+    Sanitize the input value to prevent XSS attacks.
+    :param input_value: The input value to sanitize.
+    :return: Sanitized input value.
+    """
+    if not input_value:
+        return ""
+
+    input_value = input_value.replace(" ", "") # Remove spaces
+    input_value = input_value.replace("-", "") # Remove hyphens
+    input_value = input_value.replace("_", "") # Remove underscores
+    return input_value.strip() # Strip leading and trailing whitespace of all kinds
+
 
 if __name__ == "__main__":
-    from dash_app import sanitize_input # putting this here to avoid circular import issues
-
     print("Acquiring course information... Please wait.")
     crses = load_courses(terminal=True)
     while True:
