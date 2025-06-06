@@ -2,6 +2,7 @@ from dash import html, Dash, dcc, dash_table, Input, Output, State
 from waitress import serve
 import kuali_driver as kd
 import base64
+import flask
 import time
 import os
 
@@ -195,10 +196,18 @@ def update_output(n_clicks, n_submit, course_id):
     :param course_id: The course ID entered by the user.
     :return: HTML content to display the course alternatives or an error message.
     """
+    # Determine which input triggered the callback
     trigger = n_clicks or n_submit
+    # Sanitize the course_id input
     course_id = kd.sanitize_input(course_id)
-    print(f"[INFO - {time.strftime('%Y-%m-%d %H:%M:%S')}] Callback triggered: n_clicks={n_clicks}, n_submit={n_submit}, course_id={course_id}")
+
+    # Log the request with timestamp and course ID. Print statements go to Passenger log.
+    print(f"[INFO - {time.strftime('%Y-%m-%d %H:%M:%S')}] {flask.request.remote_addr} called: n_clicks={n_clicks}, "
+          f"n_submit={n_submit}, course_id={'Homepage' if not course_id else course_id}")
+
+    # If no button has been clicked or submitted, return a default message
     if trigger and trigger > 0:
+        # If course_id is empty, return an error message
         if not course_id:
             return html.Div("Please enter a valid course ID.", style={'color': 'red', 'textAlign': 'center'})
 
@@ -236,6 +245,7 @@ def update_output(n_clicks, n_submit, course_id):
             )
         ], style={'textAlign': 'center'})
 
+    # If no button has been clicked or submitted, return a default message
     return html.Div("Enter a course ID and click Submit to see alternatives.", style={'textAlign': 'center'})
 
 app.clientside_callback(
