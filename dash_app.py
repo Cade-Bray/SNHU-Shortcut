@@ -8,7 +8,6 @@ import os
 # Dashboard Layout / View
 #########################
 
-# Making it the app global so it can be used in the callback
 app = Dash(
         "SNHU Shortcut Dash App",
         assets_folder=".images",
