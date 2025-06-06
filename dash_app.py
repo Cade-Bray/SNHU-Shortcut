@@ -180,6 +180,20 @@ app.layout = html.Div(
     ]
 )
 
+def sanitize_input(input_value):
+    """
+    Sanitize the input value to prevent XSS attacks.
+    :param input_value: The input value to sanitize.
+    :return: Sanitized input value.
+    """
+    if not input_value:
+        return ""
+
+    input_value = input_value.replace(" ", "") # Remove spaces
+    input_value = input_value.replace("-", "") # Remove hyphens
+    input_value = input_value.replace("_", "") # Remove underscores
+    return input_value.strip() # Strip leading and trailing whitespace of all kinds
+
 @app.callback(
     Output("output_div", "children"),
     Input("submit_button", "n_clicks"),
@@ -195,7 +209,7 @@ def update_output(n_clicks, n_submit, course_id):
     :return: HTML content to display the course alternatives or an error message.
     """
     trigger = n_clicks or n_submit
-    course_id = course_id.strip() if course_id else ""
+    course_id = sanitize_input(course_id)
     print(f"Callback triggered: n_clicks={n_clicks}, n_submit={n_submit}, course_id={course_id}")
     if trigger and trigger > 0:
         if not course_id:
