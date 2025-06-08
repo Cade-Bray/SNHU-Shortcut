@@ -5,6 +5,7 @@ import base64
 import flask
 import time
 import os
+import re
 
 #########################
 # Dashboard Layout / View
@@ -144,7 +145,7 @@ app.layout = html.Div(
             [
                 html.Br(),
                 html.Label("Enter your course ID (EX101):"),
-                dcc.Input(id="course_id", type="text", value="", n_submit=0, style = {"margin": "10px 10px"}),
+                dcc.Input(id="course_id", type="text", value="", n_submit=0, style={"margin": "5px", "width": "80px", "fontSize": "12px", "padding": "2px"}),
                 html.Button("Submit", id="submit_button", n_clicks=0),
             ],
             style= {'textAlign': 'center', 'margin': '20px'}
@@ -182,6 +183,10 @@ app.layout = html.Div(
     ]
 )
 
+def alphanum_key(s):
+    # Split string into list of strings and integers
+    return [int(text) if text.isdigit() else text.lower() for text in re.split('([0-9]+)', s)]
+
 @app.callback(
     Output("output_div", "children"),
     Input("submit_button", "n_clicks"),
@@ -212,10 +217,43 @@ def update_output(n_clicks, n_submit, course_id):
             return html.Div("Please enter a valid course ID.", style={'color': 'red', 'textAlign': 'center'})
 
         # Fetch alternatives for the given course ID
-        alternatives = kd.load_courses().get(course_id)
+        alternatives_root = kd.load_courses()
+        alternatives = alternatives_root.get(course_id)
 
         if not alternatives:
-            return html.Div(f"No certifications found for {course_id}.", style={'color': 'red', 'textAlign': 'center'})
+            # If the course_id is not found in the loaded courses, return an error message
+            if any(course_id in key for key in alternatives_root.keys()):
+                # This assumes that the course_id is a partial match such as a department code or a course number.
+                # Return a data table with Course ID, Title, and Provider
+                data = []
+                for key in alternatives_root.keys():
+                    if course_id in key:
+                        for cert in alternatives_root[key].Certifications:
+                            data.append({
+                                "Provider": cert.provider.strip(),
+                                "Title": cert.title.strip(),
+                                "Course ID (Partial)": key
+                            })
+                return html.Div([
+                    html.H3(f"Certifications for {course_id}"),
+                    dash_table.DataTable(
+                        columns=[
+                            {"name": "Course ID (Partial)", "id": "Course ID (Partial)"},
+                            {"name": "Provider", "id": "Provider"},
+                            {"name": "Title", "id": "Title"}
+                        ],
+                        data= sorted(data, key=lambda x: alphanum_key(x["Course ID (Partial)"])),
+                        cell_selectable=False,
+                        style_table={'width': '100%', 'margin': 'auto', 'overflowX': 'auto'},
+                        style_cell={'textAlign': 'left', 'padding': '8px', 'minWidth': '100px', 'maxWidth': '300px',
+                                    'whiteSpace': 'normal'},
+                        style_header={'fontWeight': 'bold'}
+                    )
+                ], style={'textAlign': 'center'})
+
+            else:
+                return html.Div(f"No certifications found for {course_id}.",
+                                style={'color': 'red', 'textAlign': 'center'})
 
         alternatives = alternatives.Certifications
 
