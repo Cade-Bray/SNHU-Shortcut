@@ -243,7 +243,7 @@ def sanitize_input(input_value):
     input_value = input_value.replace(" ", "") # Remove spaces
     input_value = input_value.replace("-", "") # Remove hyphens
     input_value = input_value.replace("_", "") # Remove underscores
-    return input_value.strip() # Strip leading and trailing whitespace of all kinds
+    return input_value.strip().upper() # Strip leading and trailing whitespace of all kinds
 
 
 if __name__ == "__main__":
