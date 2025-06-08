@@ -226,9 +226,13 @@ def update_output(n_clicks, n_submit, course_id):
                 # This assumes that the course_id is a partial match such as a department code or a course number.
                 # Return a data table with Course ID, Title, and Provider
                 data = []
+                # Iterate through the alternatives_root to find matching course objects
                 for key in alternatives_root.keys():
+                    # Check if the course_id is a substring of the key
                     if course_id in key:
+                        # If it is, extract the certifications for that course
                         for cert in alternatives_root[key].Certifications:
+                            # Append the relevant data to the list
                             data.append({
                                 "Provider": cert.provider.strip(),
                                 "Title": cert.title.strip(),
