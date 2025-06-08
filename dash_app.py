@@ -137,15 +137,16 @@ app.layout = html.Div(
         html.P("This website can find certifications that return general elective credits as well. To find"
                " an elective credit search by the department code, the level of elective credit, and the "
                "term ELE. For example, 100 level GEN as in General elective credits would be GEN1ELE, 200 level "
-               "IT elective credits would be IT2ELE, and so on. If you search for a course ID and the results are not"
-               " updating please wait a moment because the SNHU certifications page is updating. ",
+               "IT elective credits would be IT2ELE, and so on. Partial searches are also supported by entering "
+               "GEN1, IT2, or ELE. This will return all certifications that match the partial search.",
                style={'textAlign': 'center', 'margin': '20px'}
                ),
         html.Div(
             [
                 html.Br(),
-                html.Label("Enter your course ID (EX101):"),
-                dcc.Input(id="course_id", type="text", value="", n_submit=0, style={"margin": "5px", "width": "80px", "fontSize": "12px", "padding": "2px"}),
+                html.Label("Enter your course ID:"),
+                dcc.Input(id="course_id", type="text", value="", n_submit=0, placeholder="EX101",
+                          style={"margin": "5px", "width": "80px", "fontSize": "12px", "padding": "2px"}),
                 html.Button("Submit", id="submit_button", n_clicks=0),
             ],
             style= {'textAlign': 'center', 'margin': '20px'}
