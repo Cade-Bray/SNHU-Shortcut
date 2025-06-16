@@ -1,4 +1,6 @@
 from dash import html, Dash, dcc, dash_table, Input, Output, State
+from dotenv import load_dotenv
+from flask import Response
 import kuali_driver as kd
 import base64
 import flask
@@ -10,14 +12,19 @@ import re
 # Dashboard Layout / View
 #########################
 
+# Load environment variables from .env file
+load_dotenv()
+ADSENSE_CLIENT_ID = os.getenv("ADSENSE_CLIENT_ID")
+
 app = Dash(
         "SNHU Shortcut Dash App",
+        assets_url_path="/.images",
+        assets_folder=".images",
         meta_tags=[
-            {"name": "viewport", "content": "width=device-width, initial-scale=1.0"}
+            {"name": "viewport", "content": "width=device-width, initial-scale=1.0"},
+            {"name": "google-adsense-account", "content": ADSENSE_CLIENT_ID}
         ],
     )
-
-application = app.server  # For Waitress compatibility
 
 # Create a Dash application
 app.title = "SNHU Shortcut"
@@ -30,6 +37,11 @@ logo_encoded = base64.b64encode(logo_data).decode("utf-8")
 
 app.layout = html.Div(
     children = [
+        html.Script(
+            f'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={ADSENSE_CLIENT_ID}',
+            crossOrigin = "anonymous",
+            **{'async': True}
+        ),
         html.Div(
             style= {'display': 'flex', 'flexDirection': 'row', 'justifyContent': 'space-between',
                     'alignItems': 'center', 'padding': '10px', 'flexWrap': 'wrap', 'overflow': 'hidden'},
