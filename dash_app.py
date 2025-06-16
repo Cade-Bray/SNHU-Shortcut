@@ -1,5 +1,4 @@
 from dash import html, Dash, dcc, dash_table, Input, Output, State
-from waitress import serve
 import kuali_driver as kd
 import base64
 import flask
@@ -310,7 +309,4 @@ if __name__ == "__main__":
     os.environ["BROWSER"] = "none"  # Disable browser opening
 
     # The app.run is for development purposes only
-    # app.run(debug=False, use_reloader=True, port=80)
-
-    # Use waitress to serve the app in production
-    serve(app.server, host="0.0.0.0")
+    app.run(debug=False, use_reloader=True, port=80)
