@@ -12,8 +12,6 @@ import re
 
 app = Dash(
         "SNHU Shortcut Dash App",
-        assets_folder=".images",
-        assets_url_path="/.images",
         meta_tags=[
             {"name": "viewport", "content": "width=device-width, initial-scale=1.0"}
         ],
