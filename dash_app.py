@@ -1,6 +1,5 @@
-from dash import html, Dash, dcc, dash_table, Input, Output, State
+from dash import html, Dash, dcc, dash_table, Input, Output, State, exceptions, callback_context
 from dotenv import load_dotenv
-from flask import Response
 import kuali_driver as kd
 import base64
 import flask
@@ -37,6 +36,7 @@ logo_encoded = base64.b64encode(logo_data).decode("utf-8")
 
 app.layout = html.Div(
     children = [
+        dcc.Location(id='url', refresh=False),
         html.Script(
             f'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={ADSENSE_CLIENT_ID}',
             crossOrigin = "anonymous",
@@ -50,7 +50,7 @@ app.layout = html.Div(
                     style = {'display': 'flex','flexDirection': 'row' , 'alignItems': 'center', 'position': 'relative'},
                     children = [
                         html.A(
-                            href='https://www.snhu.edu',
+                            href= "/",
                             children=[
                                 html.Img(
                                     src='data:image/png;base64,{}'.format(logo_encoded),
@@ -157,6 +157,14 @@ app.layout = html.Div(
                 dcc.Input(id="course_id", type="text", value="", n_submit=0, placeholder="EX101",
                           style={"margin": "5px", "width": "80px", "fontSize": "12px", "padding": "2px"}),
                 html.Button("Submit", id="submit_button", n_clicks=0),
+                html.Img(
+                    id="share-icon",
+                    src=".images/share-icon.png",
+                    title="Copy link to this search",
+                    style={"height": "24px", "cursor": "pointer", "marginTop": "6px", "marginLeft": "10px"}
+                ),
+                html.Div(id="copy-feedback", style={"marginLeft": "10px", "color": "green"}),
+                dcc.Store(id="copy-feedback-store", data="")
             ],
             style= {'textAlign': 'center', 'margin': '20px'}
         ),
@@ -182,7 +190,7 @@ app.layout = html.Div(
                        "timeliness, or accuracy of the software for any purpose."),
                 html.P("If you have any questions or concerns regarding this software, please contact the author(s)"
                        " directly at:"),
-                html.A(href="mailto:contact@cadebray.com", target="_blank",
+                html.A(href="mailto:bray.cade@gmail.com", target="_blank",
                        children=[
                            html.P("Contact@CadeBray.com")
                        ]
@@ -201,24 +209,30 @@ def alphanum_key(s):
     Output("output_div", "children"),
     Input("submit_button", "n_clicks"),
     Input("course_id", "n_submit"),
+    Input("url", "pathname"),
     State("course_id", "value")
 )
-def update_output(n_clicks, n_submit, course_id):
+def update_output(n_clicks, n_submit, pathname, course_id):
     """
     Callback function to update the output based on the course ID input.
     :param n_clicks: Number of times the submit button has been clicked.
     :param n_submit: Number of times the course ID input has been submitted.
     :param course_id: The course ID entered by the user.
+    :param pathname: The current URL path.
     :return: HTML content to display the course alternatives or an error message.
     """
+    if pathname and pathname != "/":
+        course_id = pathname.lstrip("/")
+        n_clicks = 1  # Simulate a submit
+
     # Determine which input triggered the callback
     trigger = n_clicks or n_submit
     # Sanitize the course_id input
     course_id = kd.sanitize_input(course_id)
 
     # Log the request with timestamp and course ID. Print statements go to Passenger log.
-    print(f"[INFO - {time.strftime('%Y-%m-%d %H:%M:%S')}] {flask.request.remote_addr} called: n_clicks={n_clicks}, "
-          f"n_submit={n_submit}, course_id={'Homepage' if not course_id else course_id}")
+    print(f"[INFO - {time.strftime('%Y-%m-%d %H:%M:%S')}] {flask.request.remote_addr} called: "
+          f"course_id={'Homepage' if not course_id else course_id} by UI")
 
     # If no button has been clicked or submitted, return a default message
     if trigger and trigger > 0:
@@ -300,6 +314,86 @@ def update_output(n_clicks, n_submit, course_id):
     # If no button has been clicked or submitted, return a default message
     return html.Div("Enter a course ID and click Submit to see alternatives.", style={'textAlign': 'center'})
 
+@app.server.route("/api/course/<course_id>")
+def get_course_info(course_id):
+    """
+    Flask route to get course information by course ID.
+    :param course_id: The course ID to look up.
+    :return: JSON response with course information or error message.
+    """
+    # Sanitize the course_id input
+    course_id = kd.sanitize_input(course_id)
+
+    # Log the request with timestamp and course ID
+    print(f"[INFO - {time.strftime('%Y-%m-%d %H:%M:%S')}] {flask.request.remote_addr} called: course_id={course_id} by API")
+
+    alternatives = kd.load_courses().get(course_id)
+
+    if not alternatives:
+        print(f"[ERROR - {time.strftime('%Y-%m-%d %H:%M:%S')}] {flask.request.remote_addr} called: course_id={course_id}"
+              f" - No certifications found")
+        return flask.jsonify({"error": f"No certifications found for {course_id}."}), 404
+
+    alternatives = alternatives.Certifications
+
+    if not isinstance(alternatives, list) or not alternatives:
+        print(
+            f"[ERROR - {time.strftime('%Y-%m-%d %H:%M:%S')}] {flask.request.remote_addr} called: course_id={course_id}"
+            f" - No certifications found")
+        return flask.jsonify({"error": f"No certifications found for {course_id}."}), 404
+
+    data = [
+        {"Title": cert.title.strip(), "Provider": cert.provider.strip()}
+        for cert in alternatives
+    ]
+
+    return flask.jsonify(data)
+
+@app.callback(
+    Output("course_id", "value"),
+    Input("url", "pathname")
+)
+def set_input_from_url(pathname):
+    if pathname and pathname != "/":
+        return pathname.lstrip("/")
+    return ""
+
+@app.callback(
+    Output("url", "pathname"),
+    [Input("submit_button", "n_clicks"), Input("course_id", "n_submit")],
+    State("course_id", "value"),
+    prevent_initial_call=True
+)
+def update_url(n_clicks, n_submit, course_id):
+    if not course_id:
+        raise exceptions.PreventUpdate
+    return f"/{course_id.strip()}"
+
+@app.callback(
+    [
+        Output("copy-feedback-store", "data"),
+        Output("copy-feedback", "children"),
+    ],
+    [
+        Input("share-icon", "n_clicks"),
+        Input("submit_button", "n_clicks"),
+        Input("course_id", "n_submit"),
+        Input("course_id", "value"),
+    ],
+    State("url", "pathname"),
+    prevent_initial_call=True
+)
+def handle_feedback(share_clicks, submit_clicks, n_submit, course_value, pathname):
+    ctx = callback_context
+    if not ctx.triggered:
+        return "", ""
+    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    if trigger_id == "share-icon" and share_clicks:
+        if pathname:
+            return "Link copied!", "Link copied!"
+    # Clear feedback on any other input
+    return "", ""
+
 app.clientside_callback(
     """
     function(n_intervals) {
@@ -314,9 +408,24 @@ app.clientside_callback(
     Input("resize-interval", "n_intervals"),
 )
 
+app.clientside_callback(
+    """
+    function(n_clicks, pathname) {
+        if (window.dash_clientside && n_clicks && pathname) {
+            const url = window.location.origin + pathname;
+            navigator.clipboard.writeText(url);
+        }
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output("share-icon", "title"),  # Dummy output, not used
+    Input("share-icon", "n_clicks"),
+    State("url", "pathname"),
+    prevent_initial_call=True
+)
 
 if __name__ == "__main__":
     os.environ["BROWSER"] = "none"  # Disable browser opening
 
     # The app.run is for development purposes only
-    app.run(debug=False, use_reloader=True, port=80)
+    app.run(debug=True, use_reloader=False, port=80)
